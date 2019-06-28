@@ -76,7 +76,7 @@ Resources:
         MaximumPercent: 200
         MinimumHealthyPercent: 100
       DesiredCount: 1
-      LaunchType: EC2
+      LaunchType: FARGATE
       ServiceRegistries:
         - RegistryArn:
             'Fn::GetAtt': ColorTellerWhiteServiceDiscoveryRecord.Arn
@@ -113,7 +113,7 @@ Resources:
         MaximumPercent: 200
         MinimumHealthyPercent: 100
       DesiredCount: 1
-      LaunchType: EC2
+      LaunchType: FARGATE
       ServiceRegistries:
         - RegistryArn:
             'Fn::GetAtt': ColorTellerBlueServiceDiscoveryRecord.Arn
@@ -150,7 +150,7 @@ Resources:
         MaximumPercent: 200
         MinimumHealthyPercent: 100
       DesiredCount: 1
-      LaunchType: EC2
+      LaunchType: FARGATE
       ServiceRegistries:
         - RegistryArn:
             'Fn::GetAtt': ColorTellerRedServiceDiscoveryRecord.Arn
@@ -187,7 +187,7 @@ Resources:
         MaximumPercent: 200
         MinimumHealthyPercent: 100
       DesiredCount: 1
-      LaunchType: EC2
+      LaunchType: FARGATE
       ServiceRegistries:
         - RegistryArn:
             'Fn::GetAtt': ColorTellerBlackServiceDiscoveryRecord.Arn
@@ -226,7 +226,7 @@ Resources:
         MaximumPercent: 200
         MinimumHealthyPercent: 100
       DesiredCount: 1
-      LaunchType: EC2
+      LaunchType: FARGATE
       ServiceRegistries:
         - RegistryArn:
             'Fn::GetAtt': ColorGatewayServiceDiscoveryRecord.Arn
@@ -255,7 +255,7 @@ Resources:
         MaximumPercent: 200
         MinimumHealthyPercent: 100
       DesiredCount: 1
-      LaunchType: EC2
+      LaunchType: FARGATE
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: DISABLED
@@ -288,7 +288,10 @@ Resources:
       TaskRoleArn:
         'Fn::ImportValue': !Sub "${EnvironmentName}:TaskIamRoleArn"
       NetworkMode: "awsvpc"
-      Memory: 256
+      RequiresCompatibilities:
+        - FARGATE
+      Cpu: 256
+      Memory: 512
 
   ### tcpecho.default.svc.cluster.local
   TcpEchoServiceDiscoveryRecord:
@@ -313,7 +316,7 @@ Resources:
         MaximumPercent: 200
         MinimumHealthyPercent: 100
       DesiredCount: 1
-      LaunchType: EC2
+      LaunchType: FARGATE
       ServiceRegistries:
         - RegistryArn:
             'Fn::GetAtt': TcpEchoServiceDiscoveryRecord.Arn
@@ -355,7 +358,10 @@ Resources:
       TaskRoleArn:
         'Fn::ImportValue': !Sub "${EnvironmentName}:TaskIamRoleArn"
       NetworkMode: "awsvpc"
-      Memory: 256
+      RequiresCompatibilities:
+        - FARGATE
+      Cpu: 256
+      Memory: 512
 
   PublicLoadBalancerSG:
     Type: AWS::EC2::SecurityGroup

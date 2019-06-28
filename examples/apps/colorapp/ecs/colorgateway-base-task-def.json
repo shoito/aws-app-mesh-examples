@@ -62,7 +62,7 @@
           "awslogs-region": $AWS_REGION,
           "awslogs-stream-prefix": $AWS_LOG_STREAM_PREFIX_APP
         }
-      },  
+      },
       "essential": true,
       "dependsOn": [
         {
@@ -76,6 +76,10 @@
   ],
   "taskRoleArn": $TASK_ROLE_ARN,
   "executionRoleArn": $EXECUTION_ROLE_ARN,
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
   "networkMode": "awsvpc",
-  "memory": "256"
+  "cpu": "256",
+  "memory": "512"
 }

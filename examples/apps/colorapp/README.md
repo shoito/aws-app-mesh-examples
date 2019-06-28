@@ -1,25 +1,25 @@
 **Contents**
 
-- [App Mesh Walkthrough: Deploy the Color App on ECS](#app-mesh-walkthrough-deploy-the-color-app-on-ecs)
-  - [Overview](#overview)
-  - [Prerequisites](#prerequisites)
-  - [Deploy infrastructure for the application](#deploy-infrastructure-for-the-application)
-    - [Create the VPC and other core Infrastructure](#create-the-vpc-and-other-core-infrastructure)
-    - [Create an App Mesh](#create-an-app-mesh)
-    - [Create compute resources](#create-compute-resources)
-    - [Review](#review)
-  - [Deploy the application](#deploy-the-application)
-    - [Configure App Mesh resources](#configure-app-mesh-resources)
-    - [Deploy services to ECS](#deploy-services-to-ecs)
-      - [Deploy images to ECR for your account](#deploy-images-to-ecr-for-your-account)
-      - [Deploy gateway and colorteller services](#deploy-gateway-and-colorteller-services)
-      - [Test the application](#test-the-application)
-  - [Shape traffic](#shape-traffic)
-    - [Apply traffic rules](#apply-traffic-rules)
-    - [Monitor with AWS X-Ray](#monitor-with-aws-x-ray)
-  - [Review](#review)
-  - [Summary](#summary)
-  - [Resources](#resources)
+- [App Mesh Walkthrough: Deploy the Color App on ECS](#App-Mesh-Walkthrough-Deploy-the-Color-App-on-ECS)
+  - [Overview](#Overview)
+  - [Prerequisites](#Prerequisites)
+  - [Deploy infrastructure for the application](#Deploy-infrastructure-for-the-application)
+    - [Create the VPC and other core Infrastructure](#Create-the-VPC-and-other-core-Infrastructure)
+    - [Create an App Mesh](#Create-an-App-Mesh)
+    - [Create compute resources](#Create-compute-resources)
+    - [Review](#Review)
+  - [Deploy the application](#Deploy-the-application)
+    - [Configure App Mesh resources](#Configure-App-Mesh-resources)
+    - [Deploy services to ECS](#Deploy-services-to-ECS)
+      - [Deploy images to ECR for your account](#Deploy-images-to-ECR-for-your-account)
+      - [Deploy gateway and colorteller services](#Deploy-gateway-and-colorteller-services)
+      - [Test the application](#Test-the-application)
+  - [Shape traffic](#Shape-traffic)
+    - [Apply traffic rules](#Apply-traffic-rules)
+    - [Monitor with AWS X-Ray](#Monitor-with-AWS-X-Ray)
+  - [Review](#Review-1)
+  - [Summary](#Summary)
+  - [Resources](#Resources)
 
 # App Mesh Walkthrough: Deploy the Color App on ECS
 
@@ -69,7 +69,6 @@ Each template has a corresponding shell script with a `.sh` extension that you r
 * `ENVIRONMENT_NAME` - will be applied as a prefix to deployed CloudFormation stack names.
 * `MESH_NAME` - name to use to identify the mesh you create.
 * `SERVICES_DOMAIN` - the base namespace to use for service discovery (e.g., `cluster.local`).
-* `KEY_PAIR_NAME` - your [Amazon EC2 Key Pair].
 * `ENVOY_IMAGE` - see [Envoy Image] for latest recommended Docker image (currently: `111345817488.dkr.ecr.us-west-2.amazonaws.com/aws-appmesh-envoy:v1.9.1.0-prod`)
 * `COLOR_GATEWAY_IMAGE` - Docker image for the Color App gateway microservice in ECR.
 * `COLOR_TELLER_IMAGE` - Docker image for the Color App colorteller microservice in ECR.
@@ -82,11 +81,9 @@ See below for more detail and to see where these environment variables are used.
 
 2. Your [AWS CLI configuration] has a `default` or named profile and valid credentials.
 
-3. You have an [Amazon EC2 Key Pair] that you can use to log into your EC2 instances.
+3. You have cloned the [github.com/aws/aws-app-mesh-examples] repo and changed directory to the project root.
 
-4. You have cloned the [github.com/aws/aws-app-mesh-examples] repo and changed directory to the project root.
-
-5. You have [jq] installed.
+4. You have [jq] installed.
 
 ## Deploy infrastructure for the application
 
@@ -167,7 +164,6 @@ Our infrastructure requires compute resources to run our services on. The follow
 In addition to the previously defined environment variables, you will also need to export the following:
 
 * `SERVICES_DOMAIN` - the base namespace to use for service discovery (e.g., `cluster.local`). For this demo, we will use `demo.local`. This means that the gateway virtual service will send requests to the colorteller virtual service at `colorteller.demo.local`.
-* `KEY_PAIR_NAME` - your [Amazon EC2 Key Pair] to log into your EC2 instances.
 
 ***Create the ECS cluster***
 
@@ -178,10 +174,9 @@ $ export AWS_PROFILE=default
 $ export AWS_DEFAULT_REGION=us-west-2
 $ export ENVIRONMENT_NAME=DEMO
 $ export SERVICES_DOMAIN=demo.local
-$ export KEY_PAIR_NAME=tony_devbox2
 $ ./examples/infrastructure/ecs-cluster.sh
 ...
-+ aws --profile default --region us-west-2 cloudformation deploy --stack-name DEMO-ecs-cluster --capabilities CAPABILITY_IAM --template-file /home/ec2-user/projects/aws/aws-app-mesh-examples/examples/infrastructure/ecs-cluster.yaml --parameter-overrides EnvironmentName=DEMO KeyName=tony_devbox2 ECSServicesDomain=demo.local ClusterSize=5
++ aws --profile default --region us-west-2 cloudformation deploy --stack-name DEMO-ecs-cluster --capabilities CAPABILITY_IAM --template-file /home/ec2-user/projects/aws/aws-app-mesh-examples/examples/infrastructure/ecs-cluster.yaml --parameter-overrides EnvironmentName=DEMO ECSServicesDomain=demo.local
 
 Waiting for changeset to be created..
 Waiting for stack create/update to complete
@@ -313,7 +308,6 @@ $ export AWS_PROFILE=default
 $ export AWS_DEFAULT_REGION=us-west-2
 $ export ENVIRONMENT_NAME=DEMO
 $ export SERVICES_DOMAIN=demo.local
-$ export KEY_PAIR_NAME=tony_devbox2
 $ export ENVOY_IMAGE=111345817488.dkr.ecr.us-west-2.amazonaws.com/aws-appmesh-envoy:v1.9.0.0-prod
 $ export COLOR_GATEWAY_IMAGE=$(aws ecr describe-repositories --repository-names=gateway --query 'repositories[0].repositoryUri' --output text)
 $ export COLOR_TELLER_IMAGE=$(aws ecr describe-repositories --repository-names=colorteller --query 'repositories[0].repositoryUri' --output text)
@@ -557,7 +551,7 @@ AWS X-Ray is a valuable tool for providing insight into your application request
 
 The following is the condensed version of all the steps we performed to run the Color App.
 
-1. Export the following environment variables needed by our deployment scripts. You can use most of the example values below for your own demo, but you will need to modify the last three using your own EC2 key pair and ECR URLs for the color images (see [Deploy gateway and colorteller services]).
+1. Export the following environment variables needed by our deployment scripts. You can use most of the example values below for your own demo, but you will need to modify the last three using your own ECR URLs for the color images (see [Deploy gateway and colorteller services]).
 
 `.env`
 ```
@@ -567,7 +561,6 @@ export ENVIRONMENT_NAME=DEMO
 export MESH_NAME=appmesh-mesh
 export SERVICES_DOMAIN=demo.local
 export ENVOY_IMAGE=111345817488.dkr.ecr.us-west-2.amazonaws.com/aws-appmesh-envoy:v1.9.0.0-prod
-export KEY_PAIR_NAME=tony_devbox2
 export COLOR_GATEWAY_IMAGE=226767807331.dkr.ecr.us-west-2.amazonaws.com/gateway
 export COLOR_TELLER_IMAGE=226767807331.dkr.ecr.us-west-2.amazonaws.com/colorteller:latest
 ```
@@ -626,7 +619,6 @@ In this demo, our services ran only on ECS. In the next post in this series, we'
 
 [A/B testing]: https://en.wikipedia.org/wiki/A/B_testing
 [Amazon CloudWatch]: https://aws.amazon.com/cloudwatch/
-[Amazon EC2 Key Pair]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html
 [Amazon Virtual Private Cloud]: https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html
 [AWS App Mesh]: https://aws.amazon.com/app-mesh/
 [AWS App Mesh Documentation]: https://aws.amazon.com/app-mesh/getting-started/
